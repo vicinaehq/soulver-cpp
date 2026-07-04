@@ -8,8 +8,8 @@ Simple C++ bindings for the [SoulverCore](https://github.com/soulverteam/Soulver
 > You can use the AUR package [`soulver-cpp-git`](https://aur.archlinux.org/packages/soulver-cpp-git), which automatically builds & installs the bindings and works with Vicinae.
 >
 > ```bash
-> paru -S soulver-cpp-git swift-bin-6.1
-> yay -S soulver-cpp-git swift-bin-6.1
+> paru -S swift-bin-6.1 soulver-cpp-git
+> yay -S swift-bin-6.1 soulver-cpp-git
 > ```
 
 The `SoulverCore` library is closed-source and distributed as a shared library.
