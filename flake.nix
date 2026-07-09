@@ -22,10 +22,10 @@
     # nixpkgs is still on v5 at the time of writing, 6.1.2 isn't the latest but it is the one that's used to build SoulcerCore
     swift-bin = pkgs.stdenv.mkDerivation rec {
       pname = "swift-bin";
-      version = "6.1.2-RELEASE";
+      version = "6.1.2";
 
       src = pkgs.fetchurl {
-        url = "https://download.swift.org/swift-6.1.2-release/ubuntu2404/swift-${version}/swift-${version}-ubuntu24.04.tar.gz";
+        url = "https://download.swift.org/swift-${version}-release/ubuntu2404/swift-${version}-RELEASE/swift-${version}-RELEASE-ubuntu24.04.tar.gz";
         hash = "sha256-10nV/i1nCe6YjpaxbwK8p7UzBNCZJeMQY/1exWAZ3p8=";
       };
 
