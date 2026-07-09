@@ -5,23 +5,13 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     # libxml2 2.14+ bumped its soname to .so.16. the Swift binaries want libxml2.so.2.
     nixpkgs-libxml2.url = "github:NixOS/nixpkgs/nixos-24.11";
-    flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = {
-    self,
-    nixpkgs,
-    nixpkgs-libxml2,
-    flake-utils,
-  }:
-  # currently x86_64 only
-    flake-utils.lib.eachSystem ["x86_64-linux"] (
-      system: let
-        pkgs = import nixpkgs {
-          inherit system;
-          config.allowUnfree = true;
-        };
-        libxml2-compat = nixpkgs-libxml2.legacyPackages.${system}.libxml2;
+  outputs = { self, nixpkgs, nixpkgs-libxml2 }:
+    let
+      system = "x86_64-linux";
+      pkgs = import nixpkgs { inherit system; config.allowUnfree = true; };
+      libxml2-compat = nixpkgs-libxml2.legacyPackages.${system}.libxml2;
 
         # nixpkgs is still on v5 at the time of writing, 6.1.2 isn't the latest but it is the one that's used to build SoulcerCore
         swift-bin = pkgs.stdenv.mkDerivation rec {
@@ -60,7 +50,7 @@
           '';
         };
       in {
-        packages.default = pkgs.stdenv.mkDerivation {
+        packages.${system}.default = pkgs.stdenv.mkDerivation {
           pname = "soulver-cpp";
           version = "1.0.0";
 
@@ -109,14 +99,13 @@
           };
         };
 
-        devShells.default = pkgs.mkShell {
+        devShells.${system}.default = pkgs.mkShell {
           inputsFrom = [self.packages.${system}.default];
           shellHook = ''
             export LD_LIBRARY_PATH=$PWD/swift/Vendor/SoulverCore-linux:$PWD/build/swift_output:$LD_LIBRARY_PATH
           '';
         };
       }
-    )
     // {
       overlays.default = final: prev: {
         soulver-cpp = self.packages.${prev.stdenv.hostPlatform.system}.default;
