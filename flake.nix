@@ -55,65 +55,64 @@
         ln -s ${pkgs.clang}/bin/clang++ $out/bin/clang++
       '';
     };
-  in
-    {
-      packages.${system}.default = pkgs.stdenv.mkDerivation {
-        pname = "soulver-cpp";
-        version = "1.0.0";
+  in {
+    packages.${system}.default = pkgs.stdenv.mkDerivation {
+      pname = "soulver-cpp";
+      version = "1.0.0";
 
-        src = ./.;
+      src = ./.;
 
-        nativeBuildInputs = with pkgs; [
-          cmake
-          ninja
-          swift-bin
-          autoPatchelfHook
-        ];
+      nativeBuildInputs = with pkgs; [
+        cmake
+        ninja
+        swift-bin
+        autoPatchelfHook
+      ];
 
-        buildInputs = with pkgs; [
-          nlohmann_json
-          stdenv.cc.cc.lib
-          # runtime deps of bundled Swift runtime libs.
-          curl
-          zlib
-        ];
+      buildInputs = with pkgs; [
+        nlohmann_json
+        stdenv.cc.cc.lib
+        # runtime deps of bundled Swift runtime libs.
+        curl
+        zlib
+      ];
 
-        preConfigure = ''
-          export HOME=$TMPDIR
-          mkdir -p $TMPDIR/sysroot/usr/lib
-          ln -s ${pkgs.glibc.dev}/include $TMPDIR/sysroot/usr/include
-          ln -s ${pkgs.glibc}/lib/* $TMPDIR/sysroot/usr/lib/
-          ln -s ${swift-bin}/lib/swift $TMPDIR/sysroot/usr/lib/swift
-          export SDKROOT=$TMPDIR/sysroot
-          export CPATH=${pkgs.glibc.dev}/include
-        '';
+      preConfigure = ''
+        export HOME=$TMPDIR
+        mkdir -p $TMPDIR/sysroot/usr/lib
+        ln -s ${pkgs.glibc.dev}/include $TMPDIR/sysroot/usr/include
+        ln -s ${pkgs.glibc}/lib/* $TMPDIR/sysroot/usr/lib/
+        ln -s ${swift-bin}/lib/swift $TMPDIR/sysroot/usr/lib/swift
+        export SDKROOT=$TMPDIR/sysroot
+        export CPATH=${pkgs.glibc.dev}/include
+      '';
 
-        preBuild = ''
-          autoPatchelf swift/Vendor/SoulverCore-linux/
-        '';
+      preBuild = ''
+        autoPatchelf swift/Vendor/SoulverCore-linux/
+      '';
 
-        postInstall = ''
-          cp -a ${swift-bin}/lib/swift/linux/*.so* $out/lib/
-          chmod -R u+w $out/lib
-          rm -f $out/lib/libFoundationXML.so
-        '';
+      postInstall = ''
+        cp -a ${swift-bin}/lib/swift/linux/*.so* $out/lib/
+        chmod -R u+w $out/lib
+        rm -f $out/lib/libFoundationXML.so
+      '';
 
-        meta = with pkgs.lib; {
-          description = "C++ bindings for the SoulverCore Swift library";
-          homepage = "https://github.com/vicinaehq/soulver-cpp";
-          platforms = platforms.linux;
-          license = licenses.unfree;
-        };
-      };
-
-      devShells.${system}.default = pkgs.mkShell {
-        inputsFrom = [self.packages.${system}.default];
-        shellHook = ''
-          export LD_LIBRARY_PATH=$PWD/swift/Vendor/SoulverCore-linux:$PWD/build/swift_output:$LD_LIBRARY_PATH
-        '';
-      };
-      overlays.default = final: prev: {
-        soulver-cpp = self.packages.${prev.stdenv.hostPlatform.system}.default;
+      meta = with pkgs.lib; {
+        description = "C++ bindings for the SoulverCore Swift library";
+        homepage = "https://github.com/vicinaehq/soulver-cpp";
+        platforms = platforms.linux;
+        license = licenses.unfree;
       };
     };
+
+    devShells.${system}.default = pkgs.mkShell {
+      inputsFrom = [self.packages.${system}.default];
+      shellHook = ''
+        export LD_LIBRARY_PATH=$PWD/swift/Vendor/SoulverCore-linux:$PWD/build/swift_output:$LD_LIBRARY_PATH
+      '';
+    };
+    overlays.default = final: prev: {
+      soulver-cpp = self.packages.${prev.stdenv.hostPlatform.system}.default;
+    };
+  };
 }
