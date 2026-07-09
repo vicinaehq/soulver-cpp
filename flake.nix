@@ -112,8 +112,6 @@
           export LD_LIBRARY_PATH=$PWD/swift/Vendor/SoulverCore-linux:$PWD/build/swift_output:$LD_LIBRARY_PATH
         '';
       };
-    }
-    // {
       overlays.default = final: prev: {
         soulver-cpp = self.packages.${prev.stdenv.hostPlatform.system}.default;
       };
